@@ -1,0 +1,354 @@
+<title>Starclyffe Financial Planning</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Invoices, expenses, check printing, bank statement import and financial reports for US businesses. $20 a month, everything included.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+/* Landing page only. Layout: hero with product view, features grid, four short product close-ups, steps, one price. */
+.hero{padding-block:clamp(48px,7vw,96px) clamp(64px,7vw,96px);background:var(--bg)}
+.hero .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:48px;align-items:center}
+.hero-copy{display:flex;flex-direction:column;gap:20px;min-width:0}
+.hero-copy h1{font-size:clamp(40px,5.8vw,66px)}
+.circled{position:relative;white-space:nowrap;display:inline-block}
+.circled svg{position:absolute;left:-6%;top:-14%;width:112%;height:128%;overflow:visible;pointer-events:none}
+.circled path{fill:none;stroke:var(--accent);stroke-width:3.2;stroke-linecap:round}
+.hero-note{font-size:14px;color:var(--muted);display:flex;gap:16px;flex-wrap:wrap}
+.hero-note span::before{content:"✓";color:var(--good);font-weight:700;margin-right:6px}
+@media (max-width:960px){.hero .wrap{grid-template-columns:minmax(0,1fr)}}
+
+.mock{position:relative;min-width:0}
+.win{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+.win-bar{display:flex;align-items:center;gap:6px;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--soft)}
+.win-bar i{width:9px;height:9px;border-radius:50%;background:var(--line)}
+.win-bar span{margin-left:10px;font-size:12px;color:var(--muted);font-weight:500}
+.dash{display:grid;grid-template-columns:140px minmax(0,1fr);min-height:330px}
+.side{border-right:1px solid var(--line);padding:14px 10px;display:flex;flex-direction:column;gap:2px;font-size:13px}
+.side div{padding:6px 10px;border-radius:6px;color:var(--muted)}
+.side div.on{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.main{padding:16px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.tile{border:1px solid var(--line);border-radius:8px;padding:10px 12px;min-width:0}
+.tile .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.tile .v{font-family:var(--f-display);font-weight:700;font-size:20px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tile .d{font-size:11.5px;color:var(--good)}
+.tile .d.neg{color:var(--bad)}
+.bars{border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.bars .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-bottom:6px}
+.bars svg{width:100%;height:auto;display:block}
+.bars svg text{fill:var(--muted);font-family:var(--f-mono);font-size:9px}
+.mini-table{font-size:12.5px;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.mini-table .r{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr) auto;gap:8px;padding:7px 12px;border-top:1px solid var(--line);align-items:center}
+.mini-table .r:first-child{border-top:none;background:var(--soft);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+.mini-table .r > *{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pill{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.pill.paid{background:var(--good-soft);color:var(--good)}
+.pill.due{background:var(--amber-soft);color:var(--amber-text)}
+.pill.late{background:var(--bad-soft);color:var(--bad)}
+.float-card{position:absolute;right:-18px;bottom:-64px;width:min(270px,62%);background:var(--card);border:1px solid var(--line);border-top:3px solid var(--accent);border-radius:12px;box-shadow:var(--shadow);padding:12px 14px;font-size:12.5px}
+.float-card b{font-size:13px}
+.float-card .row{display:flex;justify-content:space-between;gap:10px;padding:3px 0;border-bottom:1px dashed var(--line)}
+.float-card .row:last-child{border-bottom:none}
+@media (max-width:620px){.dash{grid-template-columns:minmax(0,1fr)}.side{display:none}.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.tiles .tile:nth-child(3){display:none}.float-card{position:static;width:auto;margin-top:12px}}
+
+section.band{padding-block:clamp(56px,8vw,96px)}
+section.band.alt{background:var(--soft)}
+.head h2{font-size:clamp(30px,4vw,44px)}
+.head{display:flex;flex-direction:column;gap:10px;max-width:640px;margin-bottom:36px}
+.grid6{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.feat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.feat .ic{width:40px;height:40px;border-radius:9px;background:var(--accent-soft);display:grid;place-items:center;color:var(--accent)}
+.feat:nth-child(even) .ic{background:var(--amber-soft);color:var(--amber-text)}
+.feat p{color:var(--muted);font-size:15px}
+@media (max-width:900px){.grid6{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.grid6{grid-template-columns:minmax(0,1fr)}}
+
+.spot{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:56px;align-items:center}
+.spot + .spot{margin-top:clamp(56px,8vw,88px)}
+.spot.flip .spot-copy{order:2}
+.spot-copy{display:flex;flex-direction:column;gap:12px;min-width:0}
+.spot-copy ul{margin:2px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;color:var(--muted)}
+.spot-copy li{padding-left:24px;position:relative}
+.spot-copy li::before{content:"";position:absolute;left:2px;top:9px;width:10px;height:6px;border-left:2px solid var(--accent);border-bottom:2px solid var(--accent);transform:rotate(-45deg)}
+.spot-vis{min-width:0}
+@media (max-width:900px){.spot{grid-template-columns:minmax(0,1fr);gap:24px}.spot.flip .spot-copy{order:0}}
+
+.invoice{background:var(--paper);border:1px solid var(--line);border-top:4px solid var(--accent);border-radius:10px;box-shadow:var(--shadow);padding:24px;font-size:13.5px}
+.inv-top{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.inv-top .co{font-family:var(--f-display);font-weight:800;font-size:18px}
+.inv-top .meta{text-align:right;color:var(--muted);font-size:12.5px}
+.inv-top .meta b{display:block;color:var(--ink);font-size:16px;font-family:var(--f-display)}
+.inv-lines{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.inv-lines th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);border-bottom:1px solid var(--line);padding:6px 4px;font-weight:600}
+.inv-lines td{padding:8px 4px;border-bottom:1px solid var(--line)}
+.inv-lines td:last-child,.inv-lines th:last-child{text-align:right;font-family:var(--f-mono)}
+.inv-total{display:flex;justify-content:flex-end;gap:24px;margin-top:12px;font-weight:600}
+.inv-total span:last-child{font-family:var(--f-mono);font-size:17px}
+
+.check{background:var(--check);border:1px solid var(--line);border-radius:6px;box-shadow:var(--shadow);padding:20px 22px 14px;font-size:13px;position:relative;aspect-ratio:2.4/1;max-width:100%;display:grid;grid-template-rows:auto auto auto 1fr auto;gap:8px;min-height:240px;overflow:hidden;min-width:0}
+.check .c1{display:flex;justify-content:space-between;gap:10px}
+.check .c1 b{font-family:var(--f-display);font-size:14px}
+.check .c1 small{display:block;color:var(--muted);font-size:11px;line-height:1.3}
+.check .no{font-family:var(--f-mono);color:var(--muted)}
+.check .line{display:flex;align-items:flex-end;gap:10px}
+.check .line label{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);white-space:nowrap}
+.check .line .fill{flex:1;border-bottom:1px solid var(--muted);padding:0 4px 2px;font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.check .amt{border:1px solid var(--muted);padding:2px 10px;font-family:var(--f-mono);font-weight:600;background:var(--card);white-space:nowrap}
+.check .sig{display:flex;justify-content:space-between;align-items:flex-end;gap:16px}
+.check .sig .fill{flex:1;max-width:46%;border-bottom:1px solid var(--muted)}
+.check .micr{font-family:var(--f-mono);letter-spacing:.18em;color:var(--muted);font-size:12px}
+@media (max-width:520px){.check{aspect-ratio:auto;padding:16px 14px 12px;font-size:12px}.check .line{flex-wrap:wrap;gap:4px 8px}.check .line .fill{white-space:normal}.check .c1{flex-wrap:wrap}.check .micr{font-size:10px;letter-spacing:.08em;overflow-wrap:anywhere}.check .sig .fill{max-width:40%}}
+
+.import{display:grid;grid-template-columns:minmax(0,.8fr) auto minmax(0,1.4fr);gap:14px;align-items:center}
+.doc{background:var(--paper);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);padding:16px 14px;display:flex;flex-direction:column;gap:7px;min-height:220px}
+.doc .h{font-size:11.5px;font-weight:600}
+.doc .ln{height:6px;border-radius:3px;background:var(--line)}
+.doc .ln.s{width:60%}.doc .ln.m{width:80%}
+.doc .tag{margin-top:auto;font-size:11px;color:var(--amber-text);font-family:var(--f-mono);font-weight:500}
+.arrow{color:var(--amber);font-size:28px;font-weight:700}
+.rows{background:var(--card);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);overflow:hidden;font-size:12.5px}
+.rows .r{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:10px;padding:8px 12px;border-top:1px solid var(--line);align-items:center}
+.rows .r:first-child{border-top:none}
+.rows .r > *{min-width:0}
+.rows .desc{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rows .desc small{display:block;color:var(--accent);font-size:11px;font-weight:600}
+.rows .amt{font-family:var(--f-mono);text-align:right;white-space:nowrap}
+.rows .amt.out{color:var(--bad)}
+@media (max-width:620px){.import{grid-template-columns:minmax(0,1fr)}.arrow{transform:rotate(90deg);justify-self:center}.doc{min-height:0}}
+
+.report{background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);overflow:hidden;font-size:13.5px}
+.report .tabs{display:flex;gap:4px;padding:10px 12px;border-bottom:1px solid var(--line);background:var(--soft);flex-wrap:wrap}
+.report .tabs span{font-size:12px;padding:4px 10px;border-radius:6px;color:var(--muted);font-weight:500}
+.report .tabs span.on{background:var(--card);color:var(--ink);box-shadow:0 0 0 1px var(--line)}
+.report .r{display:flex;justify-content:space-between;gap:12px;padding:8px 16px;border-top:1px solid var(--line)}
+.report .r:first-of-type{border-top:none}
+.report .r.sub{color:var(--muted);padding-left:30px}
+.report .r.tot{font-weight:700;background:var(--amber-soft)}
+.report .r span:last-child{font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.step{border-top:3px solid var(--accent);padding-top:16px;display:flex;flex-direction:column;gap:6px}
+.step:nth-child(2){border-top-color:var(--amber)}
+.step .n{font-family:var(--f-mono);font-size:13px;color:var(--muted);font-weight:500}
+.step p{color:var(--muted);font-size:15px}
+@media (max-width:760px){.steps{grid-template-columns:minmax(0,1fr)}}
+
+.price-wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px;align-items:center}
+.plan{background:var(--card);border:2px solid var(--accent);border-radius:16px;padding:30px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:16px;position:relative}
+.plan .badge{position:absolute;top:-13px;left:28px;background:var(--amber);color:var(--amber-ink);font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;letter-spacing:.04em}
+.plan .amount{display:flex;align-items:baseline;gap:8px}
+.plan .amount b{font-family:var(--f-display);font-size:60px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.plan .amount span{color:var(--muted)}
+.plan ul{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 16px;font-size:15px}
+.plan li{padding-left:24px;position:relative}
+.plan li::before{content:"";position:absolute;left:2px;top:8px;width:10px;height:6px;border-left:2px solid var(--accent);border-bottom:2px solid var(--accent);transform:rotate(-45deg)}
+.plan .fine{font-size:13px;color:var(--muted)}
+@media (max-width:900px){.price-wrap{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:480px){.plan ul{grid-template-columns:minmax(0,1fr)}.plan{padding:22px}}
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Starclyffe Financial Planning, home">
+      <img class="logo logo-light" src="assets/starclyffe-logo-navy.png" alt="Starclyffe" width="867" height="407">
+      <img class="logo logo-dark" src="assets/starclyffe-logo-white.png" alt="" aria-hidden="true" width="867" height="407">
+      <span class="product">Financial Planning</span>
+    </a>
+    <nav class="links" aria-label="Sections"><a href="#features">Features</a><a href="#how">How it works</a><a href="#pricing">Pricing</a></nav>
+    <a class="btn ghost login" href="https://app.starclyffe.com/login/">Log in</a>
+    <a class="btn primary" href="https://app.starclyffe.com/signup/">Get started</a>
+  </div>
+</header>
+
+<main id="top">
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-copy">
+      <h1>Your business finances, in <span class="circled">one place.<svg viewBox="0 0 200 60" preserveAspectRatio="none" aria-hidden="true"><path d="M150 6C108 -2 34 4 12 20C-6 33 12 52 74 55C140 58 196 48 195 28C194 12 160 4 118 5"/></svg></span></h1>
+      <p class="lede">Invoices, expenses, checks and bank statements, with clear reports every month.</p>
+      <div><a class="btn ghost" href="#how">See how it works</a></div>
+      <div class="hero-note"><span>No bank login needed</span><span>Cancel anytime</span></div>
+    </div>
+    <div class="mock" aria-label="Example of the Starclyffe Financial Planning dashboard">
+      <div class="win">
+        <div class="win-bar"><i></i><i></i><i></i><span>Harbor Lane Supply · Dashboard</span></div>
+        <div class="dash">
+          <div class="side" aria-hidden="true"><div class="on">Dashboard</div><div>Invoices</div><div>Expenses</div><div>Checks</div><div>Banking</div><div>Reports</div><div>Planning</div></div>
+          <div class="main">
+            <div class="tiles">
+              <div class="tile"><div class="k">Cash</div><div class="v">$48,210</div><div class="d">+6.2% this month</div></div>
+              <div class="tile"><div class="k">Unpaid invoices</div><div class="v">$12,640</div><div class="d neg">3 overdue</div></div>
+              <div class="tile"><div class="k">Profit · Oct</div><div class="v">$9,385</div><div class="d">31% margin</div></div>
+            </div>
+            <div class="bars">
+              <div class="k">Income vs. expenses</div>
+              <svg viewBox="0 0 360 110" role="img" aria-label="Monthly income and expenses, income higher every month">
+                <line x1="0" x2="360" y1="92" y2="92" stroke="var(--line)"/>
+                <rect x="14" y="40" width="16" height="52" rx="2" fill="var(--accent)"/><rect x="32" y="54" width="16" height="38" rx="2" fill="var(--amber)"/>
+                <rect x="74" y="34" width="16" height="58" rx="2" fill="var(--accent)"/><rect x="92" y="50" width="16" height="42" rx="2" fill="var(--amber)"/>
+                <rect x="134" y="44" width="16" height="48" rx="2" fill="var(--accent)"/><rect x="152" y="52" width="16" height="40" rx="2" fill="var(--amber)"/>
+                <rect x="194" y="28" width="16" height="64" rx="2" fill="var(--accent)"/><rect x="212" y="48" width="16" height="44" rx="2" fill="var(--amber)"/>
+                <rect x="254" y="22" width="16" height="70" rx="2" fill="var(--accent)"/><rect x="272" y="46" width="16" height="46" rx="2" fill="var(--amber)"/>
+                <rect x="314" y="16" width="16" height="76" rx="2" fill="var(--accent)"/><rect x="332" y="44" width="16" height="48" rx="2" fill="var(--amber)"/>
+                <text x="31" y="106" text-anchor="middle">May</text><text x="91" y="106" text-anchor="middle">Jun</text><text x="151" y="106" text-anchor="middle">Jul</text>
+                <text x="211" y="106" text-anchor="middle">Aug</text><text x="271" y="106" text-anchor="middle">Sep</text><text x="331" y="106" text-anchor="middle">Oct</text>
+              </svg>
+            </div>
+            <div class="mini-table">
+              <div class="r"><span>Customer</span><span>Invoice</span><span>Status</span></div>
+              <div class="r"><span>Bayview Dental</span><span class="num">#1042 · $2,400</span><span class="pill paid">Paid</span></div>
+              <div class="r"><span>Northgate Cafe</span><span class="num">#1043 · $860</span><span class="pill due">Due Nov 30</span></div>
+              <div class="r"><span>Pine &amp; Co. Builders</span><span class="num">#1039 · $5,150</span><span class="pill late">12 days late</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="float-card" aria-hidden="true">
+        <b>Statement imported</b>
+        <div class="row"><span>Business checking · Oct</span><span class="num">84 lines</span></div>
+        <div class="row"><span>Categorized</span><span class="num">79</span></div>
+        <div class="row"><span>To review</span><span class="num">5</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="features">
+  <div class="wrap">
+    <div class="head"><h2>Everything you need</h2></div>
+    <div class="grid6">
+      <div class="feat"><span class="ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 2.5h7l3 3v12H5z"/><path d="M8 9h5M8 12h5M8 15h3"/></svg></span><h3>Invoices</h3><p>Send invoices and see who has paid.</p></div>
+      <div class="feat"><span class="ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 5h14v11H3z"/><path d="M3 8h14M6 12h3"/></svg></span><h3>Expenses</h3><p>Record spending by category, with receipts.</p></div>
+      <div class="feat"><span class="ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M2 5.5h16v9H2z"/><path d="M5 11.5h6M13 9h2.5"/></svg></span><h3>Checks</h3><p>Write and print checks on standard check paper.</p></div>
+      <div class="feat"><span class="ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M10 2.5v9M6.5 8l3.5 3.5L13.5 8"/><path d="M3 13v4h14v-4"/></svg></span><h3>Bank statements</h3><p>Upload a PDF or CSV. We pull out the transactions.</p></div>
+      <div class="feat"><span class="ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 17V3M3 17h14"/><path d="M6 13l3-4 3 2 4-6"/></svg></span><h3>Reports</h3><p>Profit and loss, balance sheet and cash flow.</p></div>
+      <div class="feat"><span class="ic" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10" cy="10" r="7.5"/><path d="M10 5v5l3.5 2"/></svg></span><h3>Planning</h3><p>Forecast, pricing and breakeven, in Excel.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="band alt" aria-label="Product details">
+  <div class="wrap">
+    <div class="spot">
+      <div class="spot-copy">
+        <h2>Invoices in a minute</h2>
+        <ul><li>Saved customers and items</li><li>Sales tax per line</li><li>Paid, due and overdue at a glance</li></ul>
+      </div>
+      <div class="spot-vis">
+        <div class="invoice" role="img" aria-label="Example invoice for $860">
+          <div class="inv-top">
+            <div><div class="co">Harbor Lane Supply</div><div class="muted" style="font-size:12.5px">Bill to: Northgate Cafe</div></div>
+            <div class="meta"><b>Invoice #1043</b>Due Nov 30, 2026</div>
+          </div>
+          <table class="inv-lines">
+            <thead><tr><th>Item</th><th>Qty</th><th>Amount</th></tr></thead>
+            <tbody>
+              <tr><td>Paper cups, 12 oz (case)</td><td>6</td><td>$378.00</td></tr>
+              <tr><td>Compostable lids (case)</td><td>6</td><td>$222.00</td></tr>
+              <tr><td>Napkins, 2-ply (case)</td><td>4</td><td>$196.00</td></tr>
+              <tr><td>Sales tax 8.25%</td><td></td><td>$64.00</td></tr>
+            </tbody>
+          </table>
+          <div class="inv-total"><span>Total due</span><span>$860.00</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="spot flip">
+      <div class="spot-copy">
+        <h2>Print real checks</h2>
+        <ul><li>Standard check-on-top paper</li><li>Amount in words filled in</li><li>Check register kept for you</li></ul>
+      </div>
+      <div class="spot-vis">
+        <div class="check" role="img" aria-label="Example check for $1,284.50">
+          <div class="c1"><div><b>Harbor Lane Supply LLC</b><small>Sample address line<br>City, State ZIP</small></div><div class="no">No. 2051</div></div>
+          <div class="line"><label>Date</label><span class="fill" style="flex:0 0 120px">11/20/2026</span></div>
+          <div class="line"><label>Pay to the order of</label><span class="fill">Coastal Electric Co.</span><span class="amt">$1,284.50</span></div>
+          <div class="line"><span class="fill">One thousand two hundred eighty-four and 50/100</span><label>Dollars</label></div>
+          <div class="sig"><div class="line" style="flex:1"><label>Memo</label><span class="fill">October service</span></div><span class="fill" aria-hidden="true"></span></div>
+          <div class="micr" aria-hidden="true">⑈002051⑈ ⑆000000000⑆ 0000000000⑈</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="spot">
+      <div class="spot-copy">
+        <h2>Upload a statement. Skip the typing.</h2>
+        <ul><li>PDF or CSV from any US bank</li><li>Categories suggested for you</li><li>No bank password needed</li></ul>
+      </div>
+      <div class="spot-vis">
+        <div class="import" role="img" aria-label="A bank statement turned into categorized transactions">
+          <div class="doc"><span class="h">October statement.pdf</span><span class="ln"></span><span class="ln m"></span><span class="ln s"></span><span class="ln"></span><span class="ln m"></span><span class="ln s"></span><span class="ln m"></span><span class="tag">84 transactions found</span></div>
+          <span class="arrow" aria-hidden="true">→</span>
+          <div class="rows">
+            <div class="r"><span class="num">10/02</span><span class="desc">Deposit · Bayview Dental<small>Invoice #1042</small></span><span class="amt">+$2,400.00</span></div>
+            <div class="r"><span class="num">10/04</span><span class="desc">Check #2047<small>Rent</small></span><span class="amt out">−$3,200.00</span></div>
+            <div class="r"><span class="num">10/09</span><span class="desc">Shell Oil 5521<small>Fuel</small></span><span class="amt out">−$86.40</span></div>
+            <div class="r"><span class="num">10/12</span><span class="desc">Office Depot #3310<small>Office supplies</small></span><span class="amt out">−$142.19</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="spot flip">
+      <div class="spot-copy">
+        <h2>Know where you stand</h2>
+        <ul><li>Profit and loss, balance sheet, cash flow</li><li>Forecast, pricing and breakeven</li><li>Download to Excel or PDF</li></ul>
+      </div>
+      <div class="spot-vis">
+        <div class="report" role="img" aria-label="Example profit and loss with $9,385 net profit">
+          <div class="tabs"><span class="on">Profit &amp; loss</span><span>Balance sheet</span><span>Cash flow</span></div>
+          <div class="r"><span>Income</span><span>$30,270</span></div>
+          <div class="r"><span>Cost of goods sold</span><span>−$11,540</span></div>
+          <div class="r"><span>Operating expenses</span><span>−$9,345</span></div>
+          <div class="r sub"><span>Rent</span><span>−$3,200</span></div>
+          <div class="r sub"><span>Payroll</span><span>−$5,180</span></div>
+          <div class="r tot"><span>Net profit · October</span><span>$9,385</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="how">
+  <div class="wrap">
+    <div class="head"><h2>How it works</h2></div>
+    <div class="steps">
+      <div class="step"><span class="n">1</span><h3>Create your account</h3><p>Add your business name and logo.</p></div>
+      <div class="step"><span class="n">2</span><h3>Add your numbers</h3><p>Upload a statement or send your first invoice.</p></div>
+      <div class="step"><span class="n">3</span><h3>See your reports</h3><p>They update as you go.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="pricing">
+  <div class="wrap price-wrap">
+    <div class="head" style="margin-bottom:0"><h2>$20 a month. Everything included.</h2></div>
+    <div class="plan">
+      <span class="badge">ONE PLAN</span>
+      <div class="amount"><b>$20</b><span>per month</span></div>
+      <ul><li>Invoices</li><li>Expenses</li><li>Check printing</li><li>Bank statements</li><li>Reports</li><li>Planning tools</li></ul>
+      <a class="btn primary" href="https://app.starclyffe.com/signup/">Get started</a>
+      <p class="fine">Cancel anytime.</p>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="brandcol">
+        <img class="logo logo-light" src="assets/starclyffe-logo-navy.png" alt="Starclyffe" width="867" height="407">
+        <img class="logo logo-dark" src="assets/starclyffe-logo-white.png" alt="" aria-hidden="true" width="867" height="407">
+        <p>Bookkeeping for US businesses.</p>
+        <a class="mail" href="mailto:brandon.shields@starclyffe.com">brandon.shields@starclyffe.com</a>
+      </div>
+      <div><h4>Product</h4><ul><li><a href="#features">Features</a></li><li><a href="#how">How it works</a></li><li><a href="#pricing">Pricing</a></li></ul></div>
+      <div><h4>Help</h4><ul><li><a href="faq/index.html">FAQ</a></li><li><a href="mailto:brandon.shields@starclyffe.com">Contact us</a></li><li><a href="https://app.starclyffe.com/login/">Log in</a></li></ul></div>
+      <div><h4>Legal</h4><ul><li><a href="terms/index.html">Terms</a></li><li><a href="privacy/index.html">Privacy</a></li></ul></div>
+    </div>
+    <div class="foot-bottom"><span>© 2026 Starclyffe. All rights reserved.</span><span>United States (USD)</span></div>
+  </div>
+</footer>
