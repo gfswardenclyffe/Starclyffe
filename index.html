@@ -139,7 +139,7 @@ const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const WORLDS={
   games:{title:'Games',accent:'#C28A1C',desc:'A place for playful worlds, little adventures, and stories you can step inside. Discover what happens when imagination becomes interactive.',tags:['Experiences','Demos','Worlds']},
   music:{title:'Music',accent:'#B0303E',desc:'Music for other universes. Original compositions, atmosphere, and soundtracks for games, films, and the moments in between.',tags:['Original music','Licensing','Soundtracks']},
-  data:{title:'Data Analysis',accent:'#2F5D8C',desc:'Find patterns, ask better questions, and turn complexity into clarity. Thoughtful tools, creative intelligence, and data-driven possibilities.',tags:['Analytics','Software','Intelligence']},
+  data:{title:'Data Analysis',accent:'#2F5D8C',desc:'Find patterns, ask better questions, and turn complexity into clarity. Now open: Financial Planning, your business finances in one place. Send invoices in a minute, print real checks, upload a statement instead of typing, and always know where you stand. $20 a month, everything included.',tags:['Financial Planning','Invoices','Checks','Statements'],link:{href:'/financialplanning/',text:'Open Financial Planning',same:true},status:'Financial Planning is open'},
   sparky:{title:'Sparky Chicken',accent:'#D20001',desc:'Private internet. Private chickens. A secure connection with exits in Dallas and Mexico City, so you can watch your chickens in peace.',tags:['Private VPN','Windows','macOS'],link:{href:'https://sparkychicken.starclyffe.com/',text:'Visit Sparky Chicken'},status:'Open beta'}
 };
 
@@ -411,7 +411,7 @@ function fly(to,ms,done){flying={from:{...cam},to,t0:performance.now(),ms,done}}
 function enter(id){const p=planets[id],w=WORLDS[id];hover=null;label.classList.remove('on');cv.classList.remove('over');
   inWorld=id;document.body.classList.add('inworld');
   $('#p-title').textContent=w.title;$('#p-desc').textContent=w.desc;$('#p-tags').innerHTML=w.tags.map(t=>`<li>${t}</li>`).join('');
-  $('#p-status').textContent=w.status||'Coming to life';const ln=$('#p-link');if(w.link){ln.hidden=false;ln.href=w.link.href;ln.textContent=w.link.text}else ln.hidden=true;
+  $('#p-status').textContent=w.status||'Coming to life';const ln=$('#p-link');if(w.link){ln.hidden=false;ln.href=w.link.href;ln.textContent=w.link.text;if(w.link.same){ln.removeAttribute('target')}else{ln.target='_blank'}}else ln.hidden=true;
   $('#panel').style.setProperty('--accent',w.accent);$('#panel').setAttribute('aria-hidden','false');
   document.querySelectorAll('.worlds button').forEach(b=>b.setAttribute('aria-current',b.dataset.world===id));
   const off=W>720?p.rd*.95:0, dz=p.rd*(W>720?3.4:4.2);
