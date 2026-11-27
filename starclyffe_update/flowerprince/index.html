@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="/favicon.png">
+<title>The Flower Prince</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="The Flower Prince, a game in progress from Starclyffe. A grey city, a fungus kingdom, and one boy with a sword that blooms.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap">
+<style>
+/* Layout: Starclyffe's paper-and-ink universe. A full-width living engraving (the story plays on its own),
+   then three quiet sections: the story, the characters, the plan of lights. Colour lives only in flowers and gold. */
+:root {
+  --paper: #FAFAF7;   /* Starclyffe paper */
+  --ink: #17161D;     /* engraving ink */
+  --ink2: #4A4855;    /* quiet text */
+  --rule: #D9D7D0;    /* hairlines */
+  --gold: #C28A1C;    /* the Games world, the sun */
+  --crimson: #B0303E; /* passionflowers */
+  --spore: #7A4A8E;   /* the Fungi Kingdom */
+  --display: "IM Fell English", "Iowan Old Style", Georgia, serif;
+  --body: "Spectral", Georgia, serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html { background: var(--paper); }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 17px; line-height: 1.6; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--paper); }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+/* top bar, like the cluster page */
+.top { position: absolute; z-index: 4; top: env(safe-area-inset-top, 0px); left: 0; right: 0; }
+.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 18px; max-width: none; padding-left: max(18px, env(safe-area-inset-left, 0px)); padding-right: max(18px, env(safe-area-inset-right, 0px)); }
+.logo { display: block; width: 120px; aspect-ratio: 1100 / 446; background: var(--gold); -webkit-mask: url(assets/starclyffe-logo.png) center / contain no-repeat; mask: url(assets/starclyffe-logo.png) center / contain no-repeat; }
+.nav { display: flex; gap: 22px; font-family: var(--display); font-size: 18px; }
+.nav a { text-decoration: none; border-bottom: 1px solid transparent; padding-bottom: 2px; }
+.nav a:hover { border-color: var(--ink); }
+
+/* the living engraving */
+.hero { position: relative; height: clamp(560px, 88vh, 900px); overflow: hidden; border-bottom: 1px solid var(--rule); background: var(--paper); }
+#stage { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: pointer; touch-action: manipulation; }
+.title { position: absolute; z-index: 3; left: max(18px, env(safe-area-inset-left, 0px)); top: clamp(86px, 13vh, 130px); max-width: 430px; pointer-events: none; }
+.eyebrow { font-family: var(--display); font-style: italic; color: var(--gold); font-size: 18px; }
+h1 { font-family: var(--display); font-weight: 400; font-size: clamp(46px, 6.6vw, 88px); line-height: .92; margin: 4px 0 12px; text-wrap: balance; }
+.lede { margin: 0 0 18px; color: var(--ink2); max-width: 34ch; }
+.cta { display: flex; flex-wrap: wrap; gap: 12px; pointer-events: auto; }
+.btn { font-family: var(--display); font-size: 19px; text-decoration: none; padding: 7px 18px; border: 1px solid var(--ink); background: var(--paper); }
+.btn.gold { background: var(--ink); color: var(--paper); }
+.btn:hover { border-color: var(--gold); color: var(--gold); }
+.btn.gold:hover { background: var(--gold); color: var(--paper); }
+
+/* caption card: the Starclyffe double-framed panel */
+.card { position: absolute; z-index: 3; right: max(18px, env(safe-area-inset-right, 0px)); bottom: 22px; width: min(360px, calc(100% - 36px)); background: var(--paper); border: 1px solid var(--ink); padding: 14px 18px 12px; box-shadow: 6px 6px 0 -1px var(--paper), 6px 6px 0 0 var(--ink); transition: opacity .5s; }
+.card .ch { font-family: var(--display); font-style: italic; color: var(--gold); font-size: 16px; }
+.card p { margin: 2px 0 0; font-size: 15px; line-height: 1.5; min-height: 3em; }
+.controls { position: absolute; z-index: 3; left: max(18px, env(safe-area-inset-left, 0px)); bottom: 22px; display: flex; gap: 10px; align-items: center; }
+.controls button { font-family: var(--display); font-size: 16px; background: var(--paper); border: 1px solid var(--ink); padding: 4px 14px; cursor: pointer; color: var(--ink); }
+.hint { font-family: var(--display); font-style: italic; color: var(--ink2); font-size: 15px; }
+
+/* sections */
+section.band { padding-block: 84px; border-bottom: 1px solid var(--rule); }
+.kicker { font-family: var(--display); font-style: italic; color: var(--gold); font-size: 19px; }
+h2 { font-family: var(--display); font-weight: 400; font-size: clamp(34px, 4.2vw, 54px); line-height: 1; margin: 4px 0 18px; text-wrap: balance; }
+.story { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: start; }
+.story p { margin: 0 0 14px; }
+.story .quote { font-family: var(--display); font-size: 26px; line-height: 1.25; border-left: 2px solid var(--gold); padding-left: 18px; margin: 6px 0 0; }
+
+.cast { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; margin-top: 32px; }
+.cast article { border: 1px solid var(--ink); padding: 18px 18px 20px; display: grid; gap: 8px; align-content: start; background: var(--paper); box-shadow: 6px 6px 0 -1px var(--paper), 6px 6px 0 0 var(--ink); }
+.cast .pic { height: 210px; display: grid; place-items: end center; border-bottom: 1px solid var(--rule); margin-bottom: 6px; }
+.cast h3 { font-family: var(--display); font-weight: 400; font-size: 28px; margin: 0; }
+.cast .role { font-family: var(--display); font-style: italic; color: var(--ink2); }
+.cast p { margin: 0; font-size: 15.5px; }
+.sprite { width: var(--w); background-repeat: no-repeat; background-position: 0 0; background-size: calc(var(--n) * var(--w)) 100%; animation: play var(--d) steps(var(--n)) infinite; }
+@keyframes play { to { background-position: calc(var(--n) * var(--w) * -1) 0; } }
+.s-elian { --w: 214px; aspect-ratio: 486 / 436; background-image: url(assets/elian_walk_right_sheet.png); --n: 8; --d: 1s; }
+.s-witch { --w: 118px; aspect-ratio: 520 / 880; background-image: url(assets/witch_idle_sheet.png); --n: 8; --d: 1.12s; }
+.s-bug { --w: 150px; aspect-ratio: 1; background-image: url(assets/sporebug_fly_sheet.png); --n: 6; --d: .48s; margin-bottom: 30px; }
+
+.lights { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 40px; align-items: center; }
+.lights svg { width: 100%; max-width: 480px; height: auto; display: block; margin: 0 auto; }
+.lights ol { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--ink); }
+.lights li { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--rule); align-items: baseline; }
+.lights li b { font-family: var(--display); font-weight: 400; font-size: 21px; }
+.lights li span { color: var(--ink2); font-size: 15px; }
+.lights li em { font-family: var(--display); color: var(--ink2); font-size: 15px; }
+.lights li.on em { color: var(--gold); }
+.lights .n { font-family: var(--display); color: var(--ink2); }
+
+footer { padding-block: 34px 44px; font-size: 14px; color: var(--ink2); }
+footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+
+@media (max-width: 760px) {
+  .nav { display: none; }
+  .title { max-width: none; right: 18px; }
+  .lede { font-size: 15.5px; }
+  .card { bottom: 70px; }
+  .story, .lights { grid-template-columns: minmax(0, 1fr); }
+  .cast { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) { .sprite { animation: none; } .card { transition: none; } }
+</style>
+</head>
+<body>
+
+
+<header class="top">
+  <div class="wrap">
+    <a class="logo" href="https://www.starclyffe.com/" aria-label="Starclyffe, back to the cluster"></a>
+    <nav class="nav" aria-label="Sections"><a href="#story">Story</a><a href="#cast">Characters</a><a href="#lights">The worlds</a></nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero" aria-label="The Flower Prince, an animated preview">
+    <canvas id="stage" role="img" aria-label="An engraved New York skyline overrun by violet fungus. Elian, a boy with a ceremonial crown and a flower sword, crosses the rooftops, defeats a Mushroom Witch and spore bugs, and each roof bursts into colourful flowers while a sun of lights rekindles above."></canvas>
+    <div class="title">
+      <div class="eyebrow">Starclyffe Games · Coming to life</div>
+      <h1>The Flower Prince</h1>
+      <p class="lede">A grey city, a creeping fungus kingdom, and one boy with a sword that blooms.</p>
+      <div class="cta"><a class="btn gold" href="#story">Read the story</a><a class="btn" href="https://www.starclyffe.com/">Back to Starclyffe</a></div>
+    </div>
+    <div class="controls"><button id="pause" type="button" aria-pressed="false">Pause</button><span class="hint">Tap the city to strike</span></div>
+    <div class="card" aria-live="polite"><div class="ch" id="ch">I. The grey city</div><p id="cap">The Fungi Kingdom has crept over New York. Its rooftops are soft with spores.</p></div>
+  </section>
+
+  <section class="band" id="story">
+    <div class="wrap story">
+      <div>
+        <div class="kicker">The story</div>
+        <h2>Every city once had a garden on its roof</h2>
+        <p class="quote">"Follow the light, and see what you discover."</p>
+      </div>
+      <div>
+        <p>Above the cities of Starclyffe hangs a sun made of lights. Each light is a world, and each world keeps a garden. When the Fungi Kingdom began to spread, the gardens went grey one by one, and the sun grew dim.</p>
+        <p>Elian Chrysanthos wears a ceremonial crown and carries a rapier that is also a sword lily. Where it strikes, spores turn to petals and the roofs remember what grew there.</p>
+        <p>His first city is New York. Each rooftop he heals relights a small part of the sun. Paris is next.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="cast">
+    <div class="wrap">
+      <div class="kicker">Characters</div>
+      <h2>Who you will meet on the rooftops</h2>
+      <div class="cast">
+        <article>
+          <div class="pic"><div class="sprite s-elian" role="img" aria-label="Elian walking"></div></div>
+          <h3>Elian Chrysanthos</h3>
+          <div class="role">The Flower Prince</div>
+          <p>A quiet boy with dense black curls, a Benkan crown and a cape far too big for him. His sword lily turns rot into petals.</p>
+        </article>
+        <article>
+          <div class="pic"><div class="sprite s-witch" role="img" aria-label="The Mushroom Witch swaying"></div></div>
+          <h3>The Mushroom Witch</h3>
+          <div class="role">Servant of the Fungi Kingdom</div>
+          <p>She walks on stilts and watches from under her cap with one eye. When her bells ring, spores rise from the mushrooms on her hat.</p>
+        </article>
+        <article>
+          <div class="pic"><div class="sprite s-bug" role="img" aria-label="A spore bug flying"></div></div>
+          <h3>Spore bugs</h3>
+          <div class="role">The Fungi Kingdom's swarm</div>
+          <p>Round black beetles that drift over the streets and sow violet spores on every roof they pass.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="lights">
+    <div class="wrap lights">
+      <svg viewBox="0 0 400 400" role="img" aria-label="The plan of lights: a sun in the centre with six worlds around it. New York is lit." id="plan"></svg>
+      <div>
+        <div class="kicker">The plan of lights</div>
+        <h2>Six worlds around one sun</h2>
+        <ol>
+          <li class="on"><span class="n">I</span><div><b>New York</b><br><span>Rooftops, water towers, a spire to climb</span></div><em>Now playing</em></li>
+          <li><span class="n">II</span><div><b>Paris</b><br><span>Iron towers and balconies of vines</span></div><em>Next</em></li>
+          <li><span class="n">III</span><div><b>The Drowned Meadow</b><br><span>Lily pads over a flooded field</span></div><em>Grey</em></li>
+          <li><span class="n">IV</span><div><b>Emberbloom Desert</b><br><span>Desert roses in red dunes</span></div><em>Grey</em></li>
+          <li><span class="n">V</span><div><b>The Frostpetal Peaks</b><br><span>Roses sealed in ice</span></div><em>Grey</em></li>
+          <li><span class="n">VI</span><div><b>The Hollow Wood</b><br><span>Where the Fungi Kingdom began</span></div><em>Grey</em></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+</main>
+<footer><div class="wrap"><span>The Flower Prince is a game in progress from Starclyffe Games.</span><span>© 2026 Team Starclyffe. All rights reserved.</span></div></footer>
+
+<script>
+(() => {
+  /* ------------------------------------------------------------------ setup */
+  const cv = document.getElementById('stage'), ctx = cv.getContext('2d');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const INK = '#17161D', PAPER = '#FAFAF7', GOLD = '#C28A1C', CRIMSON = '#B0303E';
+  const VH = 900;                                    // the world is 900 units tall; width follows the screen
+  let W = 0, H = 0, dpr = 1, K = 1, VW = 1600;
+  function resize() {
+    const r = cv.getBoundingClientRect(); dpr = Math.min(devicePixelRatio || 1, 2);
+    W = r.width; H = r.height; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    K = H / VH; VW = W / K;
+  }
+  addEventListener('resize', resize); resize();
+  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+  const lerp = (a, b, u) => a + (b - a) * u;
+  const ease = (u) => u * u * (3 - 2 * u);
+  const back = (u) => { u = clamp(u); const c = 1.7; return 1 + (c + 1) * Math.pow(u - 1, 3) + c * Math.pow(u - 1, 2); };
+  const hatch = (c, x, y, w, h, gap, alpha, lw = 1) => { c.save(); c.beginPath(); c.rect(x, y, w, h); c.clip(); c.strokeStyle = `rgba(23,22,29,${alpha})`; c.lineWidth = lw; c.beginPath(); for (let yy = y + gap / 2; yy < y + h; yy += gap) { c.moveTo(x, yy); c.lineTo(x + w, yy); } c.stroke(); c.restore(); };
+
+  /* ------------------------------------------------------------------ sprites */
+  const SH = {
+    idle: { src: 'elian_idle_right_sheet.png', fw: 486, fh: 436, px: 243, py: 428, d: Array(8).fill(180) },
+    walk: { src: 'elian_walk_right_sheet.png', fw: 486, fh: 436, px: 243, py: 428, d: Array(8).fill(125) },
+    jump: { src: 'elian_jump_right_sheet.png', fw: 486, fh: 436, px: 243, py: 428, d: [90, 110, 90, 130, 100, 90, 110, 120].map(v => v * 1.35) },
+    slash: { src: 'fx_slash_right_sheet.png', fw: 486, fh: 436, px: 243, py: 428, d: [50, 50, 60, 70, 80, 100] },
+    witch: { src: 'witch_idle_sheet.png', fw: 520, fh: 880, px: 261, py: 859, d: Array(8).fill(140) },
+    cast: { src: 'witch_cast_sheet.png', fw: 520, fh: 880, px: 261, py: 859, d: [90, 90, 90, 110, 110, 110, 100, 120] },
+    wdie: { src: 'witch_death_sheet.png', fw: 520, fh: 880, px: 261, py: 859, d: [60, 80, 90, 90, 100, 110, 400] },
+    bug: { src: 'sporebug_fly_sheet.png', fw: 256, fh: 256, px: 128, py: 128, d: Array(6).fill(80) },
+    bdie: { src: 'sporebug_death_sheet.png', fw: 256, fh: 256, px: 128, py: 128, d: [60, 80, 90, 90, 100, 110, 400] }
+  };
+  let pending = 0;
+  for (const k in SH) { const s = SH[k]; s.img = new Image(); pending++; s.img.onload = () => pending--; s.img.src = 'assets/' + s.src; s.total = s.d.reduce((a, b) => a + b, 0); }
+  const FL = ['ran_big', 'ran_side', 'aster', 'aster_top', 'daisy', 'daisy_tilt', 'pet_a', 'pet_c', 'pet_d', 'pet_e'];
+  const FIMG = {}; FL.forEach(n => { const im = new Image(); im.src = 'assets/fl_' + n + '.png'; FIMG[n] = im; });
+  function frameAt(s, ms, loop) {
+    let t = loop ? ms % s.total : Math.min(ms, s.total - 1);
+    for (let i = 0; i < s.d.length; i++) { if (t < s.d[i]) return i; t -= s.d[i]; }
+    return s.d.length - 1;
+  }
+  function sprite(name, ms, x, y, sc, loop = true, alpha = 1, frame) {
+    const s = SH[name]; if (!s.img.complete) return;
+    const f = frame ?? frameAt(s, ms, loop);
+    ctx.globalAlpha = alpha;
+    ctx.drawImage(s.img, f * s.fw, 0, s.fw, s.fh, x - s.px * sc, y - s.py * sc, s.fw * sc, s.fh * sc);
+    ctx.globalAlpha = 1;
+  }
+
+  /* ------------------------------------------------------------------ engraved city */
+  const ES = .42;                   // Elian's scale: about 135 units tall
+  const B = [
+    { x: -300, w: 660, roof: 600, mat: 'brick', fire: .12, tower: .9, props: ['bulkhead', 'chimney', 'vents'], enemies: [{ type: 'witch', x: 160, act: 'full' }], land: -150 },
+    { x: 510, w: 440, roof: 520, mat: 'stone', props: ['bulkhead', 'ac', 'antenna'], enemies: [{ type: 'bug' }, { type: 'bug' }], land: 570 },
+    { x: 1110, w: 500, roof: 615, mat: 'brick2', fire: .55, tower: .22, props: ['chimney', 'vents'], enemies: [{ type: 'bug' }, { type: 'witch', x: 1450, act: 'short' }], land: 1170 },
+    { x: 1770, w: 640, roof: 560, mat: 'deco', spire: true, props: ['ac'], enemies: [{ type: 'witch', x: 2160, act: 'rematch' }], land: 1830 }
+  ];
+  const DEPTH = 22, S2 = 2, FLOOR = 42;
+  function buildFacade(b, i) {
+    seed = 31 + i * 17;
+    const top = b.spire ? b.roof - 360 : b.roof - 120, h = 1000 - top;
+    const c = document.createElement('canvas'); c.width = (b.w + DEPTH + 30) * S2; c.height = (h + 20) * S2;
+    const g = c.getContext('2d'); g.scale(S2, S2); g.translate(0, 14);
+    const R = b.roof - top;
+    const L = (x1, y1, x2, y2, a = .9, w = 1) => { g.strokeStyle = `rgba(23,22,29,${a})`; g.lineWidth = w; g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke(); };
+    const box = (x, y, w, hh, fill, a = .9, lw = 1) => { g.fillStyle = fill; g.fillRect(x, y, w, hh); g.strokeStyle = `rgba(23,22,29,${a})`; g.lineWidth = lw; g.strokeRect(x, y, w, hh); };
+
+    /* wall materials, drawn as engraving: courses of brick or blocks of stone, darker toward the shaded right */
+    function wall(x, y, w, hh, mat) {
+      const base = { brick: '#E4DCCF', brick2: '#DED6CA', stone: '#EEEAE1', deco: '#ECE8DF' }[mat];
+      g.fillStyle = base; g.fillRect(x, y, w, hh);
+      g.save(); g.beginPath(); g.rect(x, y, w, hh); g.clip();
+      if (mat.startsWith('brick')) {
+        for (let yy = y, r = 0; yy < y + hh; yy += 5, r++) {
+          L(x, yy, x + w, yy, .2, .6);
+          for (let xx = x + (r % 2) * 5.5; xx < x + w; xx += 11) { L(xx, yy, xx, yy + 5, .13, .5); if (rnd() < .035) { g.fillStyle = 'rgba(23,22,29,.08)'; g.fillRect(xx, yy, 11, 5); } }
+        }
+      } else {
+        const bh = mat === 'deco' ? 24 : 18;
+        for (let yy = y, r = 0; yy < y + hh; yy += bh, r++) { L(x, yy, x + w, yy, .22, .7); for (let xx = x + (r % 2) * 22; xx < x + w; xx += 44) L(xx, yy, xx, yy + bh, .16, .6); }
+        for (let yy = y + 2; yy < y + hh; yy += 3.4) L(x, yy, x + w, yy, .05, .5);   // fine engraving tone
+      }
+      // light from the left: the facade darkens toward its right edge and toward the street
+      const gx = g.createLinearGradient(x, 0, x + w, 0); gx.addColorStop(0, 'rgba(23,22,29,0)'); gx.addColorStop(1, 'rgba(23,22,29,.12)'); g.fillStyle = gx; g.fillRect(x, y, w, hh);
+      const gy = g.createLinearGradient(0, y, 0, y + hh); gy.addColorStop(0, 'rgba(23,22,29,0)'); gy.addColorStop(1, 'rgba(23,22,29,.16)'); g.fillStyle = gy; g.fillRect(x, y, w, hh);
+      g.restore();
+    }
+    /* a window: stone lintel, recessed dark pane, two-over-two sash, sometimes a half-drawn shade, a glint, a sill */
+    function win(x, y, ww, wh, mat) {
+      if (mat.startsWith('brick')) { box(x - 3, y - 7, ww + 6, 6, '#F1EDE5', .8, .8); box(x + ww / 2 - 3, y - 8, 6, 8, '#F6F3EC', .8, .8); }
+      g.fillStyle = '#2B2930'; g.fillRect(x, y, ww, wh);
+      const shade = rnd() < .38 ? wh * (.25 + rnd() * .45) : 0;
+      if (shade) { g.fillStyle = '#D9D4CA'; g.fillRect(x + 1.5, y + 1.5, ww - 3, shade); for (let yy = y + 4; yy < y + shade; yy += 3) L(x + 1.5, yy, x + ww - 1.5, yy, .18, .5); L(x + 1.5, y + shade, x + ww - 1.5, y + shade, .7, 1); }
+      g.strokeStyle = 'rgba(241,237,229,.85)'; g.lineWidth = 1.1; g.strokeRect(x + .8, y + .8, ww - 1.6, wh - 1.6);
+      L(x, y + wh / 2, x + ww, y + wh / 2, 0, 1); g.strokeStyle = 'rgba(241,237,229,.85)'; g.beginPath(); g.moveTo(x, y + wh / 2); g.lineTo(x + ww, y + wh / 2); g.moveTo(x + ww / 2, y); g.lineTo(x + ww / 2, y + wh); g.stroke();
+      if (!shade || rnd() < .5) { g.strokeStyle = 'rgba(255,255,255,.22)'; g.lineWidth = 1.4; g.beginPath(); g.moveTo(x + 3, y + wh / 2 - 2); g.lineTo(x + ww / 2 - 2, y + 4); g.stroke(); }
+      g.fillStyle = 'rgba(23,22,29,.35)'; g.fillRect(x, y, 2, wh);                                   // reveal shadow
+      box(x - 3, y + wh, ww + 6, 3.5, '#F3F0E9', .85, .8);
+      for (let k = 0; k < 3; k++) L(x - 2, y + wh + 5 + k * 1.6, x + ww + 2, y + wh + 5 + k * 1.6, .18 - k * .05, .6);
+    }
+    /* projecting cornice with brackets and dentils, and its cast shadow */
+    function cornice(x, y, w) {
+      g.fillStyle = 'rgba(23,22,29,.22)'; g.fillRect(x, y + 18, w, 7);
+      box(x - 7, y + 4, w + 14, 10, '#F4F1EA', .9, 1);
+      for (let xx = x; xx < x + w - 4; xx += 18) box(xx, y + 14, 6, 9, '#ECE8DF', .8, .8);
+      for (let xx = x - 6; xx < x + w + 6; xx += 5) L(xx, y + 8, xx, y + 12, .5, .7);
+      box(x - 9, y - 2, w + 18, 6, '#F7F5EF', .9, 1);                                               // coping
+    }
+    function fireEscape(x, y0, y1) {
+      const w = 74;
+      for (let yy = y0 + FLOOR - 6, k = 0; yy < y1; yy += FLOOR, k++) {
+        L(x, yy, x + w, yy, .95, 1.6);                                     // platform
+        L(x, yy - 14, x + w, yy - 14, .9, 1.1);                            // rail
+        for (let xx = x; xx <= x + w; xx += 4.5) L(xx, yy, xx, yy - 14, .55, .6);
+        const up = k % 2 ? x + 10 : x + w - 10, dn = k % 2 ? x + w - 22 : x + 22;   // zig-zag stairs to the next landing
+        if (yy + FLOOR < y1) { L(up, yy, dn, yy + FLOOR, .9, 1.1); L(up + 5, yy, dn + 5, yy + FLOOR, .9, 1.1); for (let s = 0; s < 8; s++) { const u = s / 8; L(lerp(up, dn, u), lerp(yy, yy + FLOOR, u), lerp(up + 5, dn + 5, u), lerp(yy, yy + FLOOR, u), .7, .7); } }
+        g.fillStyle = 'rgba(23,22,29,.12)'; g.fillRect(x, yy + 1, w, 5);
+      }
+    }
+    function sideFace(x, y, w, hh) {
+      g.fillStyle = '#D8D2C6'; g.beginPath(); g.moveTo(x + w, y); g.lineTo(x + w + DEPTH, y - 12); g.lineTo(x + w + DEPTH, y + hh); g.lineTo(x + w, y + hh); g.fill();
+      g.save(); g.clip(); for (let k = -40; k < hh + 40; k += 3) L(x + w, y + k, x + w + DEPTH, y + k - 12, .3, .8); g.restore();
+      g.fillStyle = '#EFEBE3'; g.beginPath(); g.moveTo(x - 9, y - 2); g.lineTo(x + DEPTH - 9, y - 14); g.lineTo(x + w + DEPTH + 9, y - 14); g.lineTo(x + w + 9, y - 2); g.closePath(); g.fill();
+      g.strokeStyle = INK; g.lineWidth = 1.2; g.stroke();
+      for (let k = 1; k < 4; k++) L(x - 9 + k * 6, y - 2 - k * 3, x + w + 9 + k * 6, y - 2 - k * 3, .14, .6);   // tar-paper roof
+    }
+    function facade(x, y, w, hh, mat, opts = {}) {
+      sideFace(x, y, w, hh);
+      wall(x, y, w, hh, mat);
+      if (mat === 'deco') {   // vertical piers carry the eye upward; spandrels get a chevron
+        const cols = Math.max(3, Math.floor(w / 32)), cw = w / cols;
+        for (let k = 0; k <= cols; k++) { const px = x + k * cw; box(px - 3.5, y + 4, 7, hh, '#F3F0E8', .55, .7); L(px + 2.5, y + 4, px + 2.5, y + hh, .18, 1.6); }
+        for (let yy = y + 26; yy < y + hh; yy += FLOOR) for (let k = 0; k < cols; k++) {
+          const wx = x + k * cw + 6, ww = cw - 12;
+          win(wx, yy, ww, 25, mat);
+          g.strokeStyle = 'rgba(23,22,29,.45)'; g.lineWidth = .8; g.beginPath(); for (let s = 0; s < 4; s++) { g.moveTo(wx + s * ww / 4, yy + 36); g.lineTo(wx + s * ww / 4 + ww / 8, yy + 31); g.lineTo(wx + (s + 1) * ww / 4, yy + 36); } g.stroke();
+        }
+      } else {
+        const cols = Math.max(2, Math.floor((w - 26) / 40)), cw = (w - 26) / cols;
+        for (let r = 0, yy = y + 34; yy < y + hh; r++, yy += FLOOR) {
+          if (r === 5) { box(x - 2, yy - 10, w + 4, 6, '#F1EDE5', .8, .9); continue; }   // belt course
+          for (let k = 0; k < cols; k++) win(x + 13 + k * cw + cw / 2 - 9, yy, 18, 28, mat);
+        }
+        if (mat === 'stone') for (let yy = y + 4; yy < y + hh; yy += 18) { const a = (Math.round(yy / 18) % 2) ? 14 : 22; box(x, yy, a, 18, '#F4F1EA', .55, .7); box(x + w - a, yy, a, 18, '#E2DDD3', .55, .7); }   // quoins
+        if (opts.fire) fireEscape(x + 13 + Math.round(opts.fire * cols) * cw - 6, y, y + hh);
+      }
+      cornice(x, y, w);
+      L(x, y, x, y + hh, 1, 1.6); L(x + w, y, x + w, y + hh, 1, 1.6);
+    }
+    /* rooftop clutter */
+    function prop(kind, px) {
+      const y = R - 2;
+      if (kind === 'bulkhead') { box(px, y - 46, 58, 46, '#E3DDD2', .95, 1.2); for (let yy = y - 46; yy < y; yy += 5) L(px, yy, px + 58, yy, .16, .6); box(px + 8, y - 34, 16, 34, '#2B2930', 1, 1); L(px - 4, y - 46, px + 62, y - 46, 1, 2); g.fillStyle = '#D8D2C6'; g.beginPath(); g.moveTo(px + 58, y - 46); g.lineTo(px + 70, y - 53); g.lineTo(px + 70, y); g.lineTo(px + 58, y); g.fill(); g.stroke(); }
+      if (kind === 'chimney') { [0, 16].forEach(o => { box(px + o, y - 40, 12, 40, '#DED6CA', .95, 1); for (let yy = y - 40; yy < y; yy += 4) L(px + o, yy, px + o + 12, yy, .22, .5); box(px + o - 2, y - 44, 16, 5, '#F3F0E9', .95, 1); }); }
+      if (kind === 'vents') { [0, 22, 36].forEach((o, k) => { const hh = 18 + k * 6; box(px + o, y - hh, 6, hh, '#E8E3DA', .9, 1); g.fillStyle = '#F3F0E9'; g.beginPath(); g.moveTo(px + o - 5, y - hh); g.lineTo(px + o + 3, y - hh - 7); g.lineTo(px + o + 11, y - hh); g.closePath(); g.fill(); g.stroke(); }); }
+      if (kind === 'ac') { box(px, y - 22, 46, 22, '#E6E1D7', .95, 1.1); for (let xx = px + 4; xx < px + 44; xx += 3) L(xx, y - 19, xx, y - 3, .45, .6); g.beginPath(); g.arc(px + 34, y - 11, 7, 0, 7); g.stroke(); }
+      if (kind === 'antenna') { L(px, y, px, y - 90, 1, 1.4); [20, 34, 48].forEach((o, k) => L(px - 14 + k * 3, y - 90 + o, px + 14 - k * 3, y - 90 + o, 1, 1)); }
+    }
+    function waterTower(tx) {
+      const ty = R - 2;
+      g.strokeStyle = INK; g.lineWidth = 1.6;
+      g.beginPath(); [-16, -6, 6, 16].forEach(dx => { g.moveTo(tx + dx, ty); g.lineTo(tx + dx * .7, ty - 36); }); g.stroke();
+      g.beginPath(); g.moveTo(tx - 16, ty - 14); g.lineTo(tx + 13, ty - 26); g.moveTo(tx + 16, ty - 14); g.lineTo(tx - 13, ty - 26); g.stroke();
+      box(tx - 20, ty - 80, 40, 44, '#E3DCCF', 1, 1.6);
+      for (let k = -20; k < 20; k += 3.4) L(tx + k, ty - 80, tx + k, ty - 36, .38, .8);
+      g.fillStyle = 'rgba(23,22,29,.18)'; g.fillRect(tx + 6, ty - 80, 14, 44);
+      [-70, -56, -44].forEach(o => L(tx - 20, ty + o, tx + 20, ty + o, 1, 1.4));
+      g.fillStyle = '#F2EEE6'; g.lineWidth = 1.6; g.beginPath(); g.moveTo(tx - 23, ty - 80); g.lineTo(tx, ty - 104); g.lineTo(tx + 23, ty - 80); g.closePath(); g.fill(); g.stroke();
+      for (let k = 0; k < 7; k++) L(tx - 20 + k * 3, ty - 82 - k * 3, tx + 20 - k * 3, ty - 82 - k * 3, .3, .7);
+      L(tx, ty - 104, tx, ty - 112, 1, 1.4); g.beginPath(); g.arc(tx, ty - 114, 2.5, 0, 7); g.stroke();
+    }
+
+    facade(0, R, b.w, h - R, b.mat, { fire: b.fire });
+    if (b.spire) {
+      const t1 = { x: b.w * .16, w: b.w * .68, y: R - 130 }, t2 = { x: b.w * .29, w: b.w * .42, y: R - 236 }, cx = b.w / 2;
+      facade(t2.x, t2.y, t2.w, 120, 'deco'); facade(t1.x, t1.y, t1.w, 136, 'deco');
+      // the crown: stepped ribs, then the mast
+      box(cx - 34, t2.y - 40, 68, 40, '#EFEBE2', 1, 1.4); for (let k = -30; k <= 30; k += 6) L(cx + k, t2.y - 40, cx + k, t2.y, .35, .8);
+      box(cx - 22, t2.y - 72, 44, 32, '#F2EEE6', 1, 1.4); for (let k = -18; k <= 18; k += 6) L(cx + k, t2.y - 72, cx + k, t2.y - 40, .35, .8);
+      g.fillStyle = '#F4F1EA'; g.beginPath(); g.moveTo(cx - 14, t2.y - 72); g.lineTo(cx - 5, t2.y - 116); g.lineTo(cx + 5, t2.y - 116); g.lineTo(cx + 14, t2.y - 72); g.closePath(); g.fill(); g.strokeStyle = INK; g.lineWidth = 1.4; g.stroke();
+      for (let k = 0; k < 6; k++) L(cx - 13 + k * 1.6, t2.y - 76 - k * 7, cx + 13 - k * 1.6, t2.y - 76 - k * 7, .5, .8);
+      L(cx, t2.y - 116, cx, 0, 1, 2.2);
+      [8, 20, 34].forEach(o => L(cx - 6, t2.y - 116 - o, cx + 6, t2.y - 116 - o, 1, 1.2));
+    }
+    (b.props || []).forEach((p, k) => prop(p, b.w * (.12 + k * .27) + (b.spire ? b.w * .55 : 0)));
+    if (b.tower) waterTower(b.w * b.tower);
+    b.img = c; b.top = top;
+    // the rot: violet patches and threads of mycelium, drawn once, faded out as the roof heals
+    const m = document.createElement('canvas'); m.width = c.width; m.height = c.height; const q = m.getContext('2d'); q.scale(S2, S2); q.translate(0, 14);
+    for (let k = 0; k < 26; k++) {
+      const x = rnd() * b.w, y = R - 6 + Math.pow(rnd(), 1.8) * 300, r = 18 + rnd() * 46;
+      const gr = q.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, 'rgba(110,60,130,.38)'); gr.addColorStop(.6, 'rgba(110,60,130,.14)'); gr.addColorStop(1, 'rgba(110,60,130,0)');
+      q.fillStyle = gr; q.beginPath(); q.arc(x, y, r, 0, 7); q.fill();
+    }
+    q.strokeStyle = 'rgba(70,35,85,.7)'; q.lineWidth = 1.1;
+    for (let k = 0; k < 30; k++) { let x = rnd() * b.w, y = R - 4; q.beginPath(); q.moveTo(x, y); for (let s = 0; s < 6; s++) { x += (rnd() - .5) * 40; y += rnd() * 34; q.lineTo(x, y); } q.stroke(); }
+    b.rot = m;
+  }
+  B.forEach(buildFacade);
+
+  /* distant skyline layers and halftone clouds */
+  function skyline(alpha, base, hmin, hmax, sd) {
+    seed = sd; const c = document.createElement('canvas'), LW = 2400; c.width = LW; c.height = 600; const g = c.getContext('2d');
+    let x = 0;
+    while (x < LW) {
+      const w = 40 + rnd() * 90, h = hmin + rnd() * (hmax - hmin), y = 600 - h;
+      g.fillStyle = `rgba(241,239,232,1)`; g.fillRect(x, y, w, h);
+      hatch(g, x, y, w, h, 3, alpha, .8);
+      g.strokeStyle = `rgba(23,22,29,${alpha * 2})`; g.lineWidth = 1; g.strokeRect(x + .5, y + .5, w, h);
+      if (rnd() < .25) { g.beginPath(); g.moveTo(x + w / 2, y); g.lineTo(x + w / 2, y - 30 - rnd() * 40); g.stroke(); }
+      x += w + (rnd() < .3 ? 6 : 0);
+    }
+    return { c, LW, base };
+  }
+  const FAR = skyline(.16, 640, 120, 300, 5), MID = skyline(.28, 740, 80, 260, 9);
+  function cloud(sd, w, h) {
+    seed = sd; const c = document.createElement('canvas'); c.width = w; c.height = h; const g = c.getContext('2d');
+    const blobs = Array.from({ length: 9 }, () => [w * (.15 + rnd() * .7), h * (.35 + rnd() * .35), h * (.22 + rnd() * .28)]);
+    g.beginPath(); blobs.forEach(([x, y, r]) => { g.moveTo(x + r, y); g.arc(x, y, r, 0, 7); }); g.save(); g.clip();
+    for (let y = 0; y < h; y += 5) { const t = y / h; g.strokeStyle = `rgba(23,22,29,${.08 + t * .4})`; g.lineWidth = .6 + t * 1.8; g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); }
+    g.restore(); return c;
+  }
+  const CLOUDS = [[cloud(3, 420, 150), 120, 180], [cloud(8, 340, 120), 900, 120], [cloud(12, 460, 160), 1600, 230], [cloud(15, 300, 110), 2300, 150]];
+
+  /* ------------------------------------------------------------------ flowers */
+  function leaf(x, y, len, ang) {
+    ctx.save(); ctx.translate(x, y); ctx.rotate(ang);
+    ctx.fillStyle = '#6E9A5E'; ctx.strokeStyle = '#2F4A2A'; ctx.lineWidth = .9;
+    ctx.beginPath(); ctx.moveTo(0, 0); ctx.bezierCurveTo(len * .3, -len * .32, len * .75, -len * .26, len, 0); ctx.bezierCurveTo(len * .75, len * .24, len * .3, len * .28, 0, 0); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(len * .92, 0); ctx.stroke(); ctx.restore();
+  }
+  function passionflower(x, y, r, rot) {   // red passiflora: ten petals, a fringe of filaments, a green crown
+    ctx.save(); ctx.translate(x, y); ctx.rotate(rot);
+    for (let k = 0; k < 10; k++) { const a = k / 10 * 6.283 + (k % 2) * .2; ctx.fillStyle = k % 2 ? '#C3283A' : '#A81E30'; ctx.strokeStyle = '#4A0F18'; ctx.lineWidth = .8; ctx.beginPath(); ctx.ellipse(Math.cos(a) * r * .5, Math.sin(a) * r * .5, r * .55, r * .2, a, 0, 7); ctx.fill(); ctx.stroke(); }
+    ctx.lineWidth = 1; for (let k = 0; k < 44; k++) { const a = k / 44 * 6.283; ctx.strokeStyle = k % 3 ? '#F2D6E0' : '#5B2A60'; ctx.beginPath(); ctx.moveTo(Math.cos(a) * r * .2, Math.sin(a) * r * .2); ctx.lineTo(Math.cos(a) * r * .62, Math.sin(a) * r * .62); ctx.stroke(); }
+    ctx.fillStyle = '#9DBB6A'; ctx.beginPath(); ctx.arc(0, 0, r * .17, 0, 7); ctx.fill(); ctx.strokeStyle = '#2F4A2A'; ctx.stroke();
+    ctx.strokeStyle = '#D9B45A'; ctx.lineWidth = 2; for (let k = 0; k < 5; k++) { const a = k / 5 * 6.283; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(Math.cos(a) * r * .3, Math.sin(a) * r * .3); ctx.stroke(); }
+    ctx.restore();
+  }
+  function desertRose(x, y, r, rot) {      // adenium: five broad petals, white heart, deep pink rims
+    ctx.save(); ctx.translate(x, y); ctx.rotate(rot);
+    for (let k = 0; k < 5; k++) {
+      const a = k / 5 * 6.283; ctx.save(); ctx.rotate(a);
+      const gr = ctx.createLinearGradient(0, 0, r, 0); gr.addColorStop(0, '#FFF6F4'); gr.addColorStop(.45, '#F3A9BE'); gr.addColorStop(1, '#C93D6E');
+      ctx.fillStyle = gr; ctx.strokeStyle = '#6E1E3A'; ctx.lineWidth = .8;
+      ctx.beginPath(); ctx.moveTo(0, 0); ctx.bezierCurveTo(r * .3, -r * .5, r * 1.05, -r * .5, r, 0); ctx.bezierCurveTo(r * 1.05, r * .45, r * .3, r * .4, 0, 0); ctx.fill(); ctx.stroke(); ctx.restore();
+    }
+    ctx.fillStyle = '#8E2448'; ctx.beginPath(); ctx.arc(0, 0, r * .12, 0, 7); ctx.fill(); ctx.restore();
+  }
+  function nightshade(x, y, r, wilt) {      // the Fungi Kingdom's poison bells: violet, drooping, a yellow beak
+    ctx.save(); ctx.translate(x, y); ctx.rotate(.5 + wilt * 1.2); ctx.globalAlpha *= 1 - wilt;
+    for (let k = 0; k < 5; k++) { const a = Math.PI / 2 + (k - 2) * .45; ctx.fillStyle = '#6A3C86'; ctx.strokeStyle = '#2A1638'; ctx.lineWidth = .8; ctx.beginPath(); ctx.ellipse(Math.cos(a) * r * .55, Math.sin(a) * r * .55, r * .5, r * .16, a, 0, 7); ctx.fill(); ctx.stroke(); }
+    ctx.fillStyle = '#E0B93A'; ctx.beginPath(); ctx.moveTo(-r * .12, 0); ctx.lineTo(0, r * .5); ctx.lineTo(r * .12, 0); ctx.fill(); ctx.restore();
+  }
+  // every roof gets its own planting: a few tall stems, window boxes, vines and, on the spire, a great bouquet
+  B.forEach((b, i) => {
+    seed = 101 + i * 13; b.fl = []; b.vines = []; b.poison = [];
+    const kinds = ['ran_big', 'ran_side', 'aster', 'aster_top', 'daisy', 'daisy_tilt', 'pet_a', 'pet_c', 'pet_d', 'pet_e', 'passion', 'rose', 'passion', 'rose'];
+    const pick = () => kinds[Math.floor(rnd() * kinds.length)];
+    const add = (bx, by, tx, ty, size, kind, delay) => b.fl.push({ bx, by, tx, ty, size, kind: kind || pick(), delay, rot: (rnd() - .5) * .8, sw: rnd() * 6 });
+    const stems = i === 3 ? 4 : 5 + Math.floor(rnd() * 3);
+    for (let k = 0; k < stems; k++) { const bx = b.x + 20 + rnd() * (b.w - 40); add(bx, b.roof - 6, bx + (rnd() - .5) * 60, b.roof - 70 - rnd() * 140, 34 + rnd() * 26, null, rnd() * .5); }
+    for (let k = 0; k < 7; k++) { const bx = b.x + 20 + rnd() * (b.w - 40), by = b.roof + 40 + rnd() * 240; add(bx, by, bx + (rnd() - .5) * 40, by - 20 - rnd() * 40, 20 + rnd() * 14, null, .2 + rnd() * .6); }
+    if (i === 3) {  // the bouquet on the spire, like a vase
+      const cx = b.x + b.w / 2, cy = b.roof - 352;
+      for (let k = 0; k < 22; k++) { const a = rnd() * 6.283, d = Math.sqrt(rnd()); add(cx, cy, cx + Math.cos(a) * 105 * d, cy - 120 + Math.sin(a) * 95 * d, 38 + rnd() * 26, null, .1 + rnd() * .6); }
+    }
+    for (let k = 0; k < 2; k++) { const vx = b.x + 30 + rnd() * (b.w - 60); b.vines.push({ x: vx, ph: rnd() * 6, delay: rnd() * .3 }); }
+    for (let k = 0; k < 4; k++) b.poison.push({ x: b.x + 30 + rnd() * (b.w - 60), r: 9 + rnd() * 6, h: 30 + rnd() * 40 });
+    b.heal = 0;
+  });
+  function drawFlower(f, grow, t) {
+    const g = clamp((grow - f.delay) / .6); if (g <= 0) return;
+    const sway = Math.sin(t * 1.3 + f.sw) * 4 * g;
+    const hx = lerp(f.bx, f.tx, ease(g)) + sway, hy = lerp(f.by, f.ty, ease(g));
+    ctx.strokeStyle = '#4E7A44'; ctx.lineWidth = 2.2; ctx.beginPath(); ctx.moveTo(f.bx, f.by); ctx.quadraticCurveTo(f.bx + (f.tx - f.bx) * .2, (f.by + hy) / 2, hx, hy); ctx.stroke();
+    if (g > .3) leaf(lerp(f.bx, hx, .45), lerp(f.by, hy, .45), f.size * .55 * g, -Math.PI / 2 + (f.sw > 3 ? .9 : -.9) - Math.PI / 2 * (f.sw > 3 ? 0 : 1) + Math.PI / 2);
+    const s = f.size * back(clamp((g - .35) / .65));
+    if (s <= 0) return;
+    if (f.kind === 'passion') return passionflower(hx, hy, s * .55, f.rot + t * .1);
+    if (f.kind === 'rose') return desertRose(hx, hy, s * .5, f.rot);
+    const im = FIMG[f.kind]; if (!im.complete || !im.naturalWidth) return;
+    const sc = s * 1.1 / Math.max(im.naturalWidth, im.naturalHeight);
+    ctx.save(); ctx.translate(hx, hy); ctx.rotate(f.rot * .6); ctx.drawImage(im, -im.naturalWidth * sc / 2, -im.naturalHeight * sc / 2, im.naturalWidth * sc, im.naturalHeight * sc); ctx.restore();
+  }
+  function drawVine(b, v, grow, t) {
+    const g = clamp((grow - v.delay) / .8); if (g <= 0) return;
+    const y0 = 940, y1 = b.roof - 4, yEnd = lerp(y0, y1, g);
+    ctx.strokeStyle = '#4E7A44'; ctx.lineWidth = 2.4; ctx.beginPath();
+    for (let y = y0; y >= yEnd; y -= 6) { const x = v.x + Math.sin(y / 38 + v.ph) * 14; y === y0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); }
+    ctx.stroke();
+    for (let y = y0 - 20; y > yEnd; y -= 34) { const x = v.x + Math.sin(y / 38 + v.ph) * 14, side = (Math.round(y / 34) % 2) ? 1 : -1; leaf(x, y, 18, side > 0 ? -.4 : Math.PI + .4); }
+    if (g > .9) passionflower(v.x + Math.sin(yEnd / 38 + v.ph) * 14, yEnd - 6, 12, t * .2);
+  }
+
+  /* ------------------------------------------------------------------ the plan of lights (the sun) */
+  const RAYS = Array.from({ length: 12 }, (_, k) => ({ a: -Math.PI / 2 + k / 12 * 6.283, long: k % 2 === 0, lit: 0 }));
+  function sun(x, y, r, glow, t) {
+    ctx.save(); ctx.translate(x, y);
+    if (glow > 0) { const gr = ctx.createRadialGradient(0, 0, 4, 0, 0, r * 2.6); gr.addColorStop(0, `rgba(232,190,90,${.55 * glow})`); gr.addColorStop(1, 'rgba(232,190,90,0)'); ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(0, 0, r * 2.6, 0, 7); ctx.fill(); }
+    ctx.rotate(t * .03);
+    RAYS.forEach(ray => {
+      const len = r * (ray.long ? 1.55 : 1.05), cr = r * (ray.long ? .26 : .19), ex = Math.cos(ray.a) * len, ey = Math.sin(ray.a) * len;
+      ctx.strokeStyle = ray.lit > .5 ? GOLD : INK; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.moveTo(Math.cos(ray.a) * r * .16, Math.sin(ray.a) * r * .16); ctx.lineTo(ex - Math.cos(ray.a) * cr, ey - Math.sin(ray.a) * cr); ctx.stroke();
+      if (ray.lit > 0) { ctx.fillStyle = `rgba(232,190,90,${ray.lit})`; ctx.beginPath(); ctx.arc(ex, ey, cr, 0, 7); ctx.fill(); }
+      ctx.strokeStyle = INK; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.arc(ex, ey, cr, 0, 7); ctx.stroke();
+    });
+    ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(0, 0, r * .62, 0, 7); ctx.stroke(); ctx.beginPath(); ctx.arc(0, 0, r * .16, 0, 7); ctx.fillStyle = glow > .5 ? GOLD : PAPER; ctx.fill(); ctx.stroke();
+    ctx.restore();
+  }
+
+  /* ------------------------------------------------------------------ particles */
+  let parts = [];
+  const burst = (x, y, n, kind) => { for (let k = 0; k < n; k++) { const a = Math.random() * 6.283, v = 60 + Math.random() * 160; parts.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 60, life: 1, kind, rot: Math.random() * 6, col: Math.random() < .5 ? '#C3283A' : '#E58AA8' }); } };
+  const AIR = Array.from({ length: 70 }, (_, k) => { seed = 900 + k; return { x: rnd() * 2600 - 300, y: rnd() * 800, r: 2 + rnd() * 3.5, sp: 6 + rnd() * 14, ph: rnd() * 6 }; });
+
+  /* ------------------------------------------------------------------ the story, as one script */
+  const E = { x: -260, y: 600, anim: 'walk', t: 0, slashT: -1 };
+  let foes = [], cam = 0, healed = 0, sunGlow = 0, fade = 0, strikeNow = false, waitingStrike = false;
+  const chEl = document.getElementById('ch'), capEl = document.getElementById('cap');
+  const say = (ch, text) => { if (chEl.textContent !== ch) { chEl.textContent = ch; capEl.textContent = text; } };
+  let dt = 0;
+  function* wait(s) { let t = 0; while (t < s) { t += dt; yield; } }
+  function* walkTo(x) { E.anim = 'walk'; while (E.x < x) { E.x = Math.min(x, E.x + 105 * dt); yield; } E.anim = 'idle'; }
+  function* jumpTo(x2, y2) {
+    const x1 = E.x, y1 = E.y, s = SH.jump, up = (s.d[0] + s.d[1]), air = s.d[2] + s.d[3] + s.d[4] + s.d[5] * .5, apex = Math.min(y1, y2) - 110;
+    E.anim = 'jump'; E.t = 0; let ms = 0;
+    while (ms < s.total) {
+      ms += dt * 1000; E.t = ms;
+      const u = clamp((ms - up) / air);
+      E.x = lerp(x1, x2, ease(u));
+      const a = y1, c = y2, bq = 2 * (apex - (a + c) / 2) * 2;       // a smooth arc through the apex
+      E.y = (1 - u) * (1 - u) * a + 2 * (1 - u) * u * (apex * 2 - (a + c) / 2) + u * u * c;
+      yield;
+    }
+    E.x = x2; E.y = y2; E.anim = 'idle';
+  }
+  function* strike() {
+    E.slashT = 0; while (E.slashT < SH.slash.total) yield;
+    E.slashT = -1;
+  }
+  /* the Mushroom Witch fights like a spinning top: she drops in spinning, rolls a ring of spores across the roof,
+     gets dizzy, and can only be struck while she wobbles */
+  function* spinTo(f, target, secs) { const s0 = f.spin; let t = 0; while (t < secs) { t += dt; f.spin = lerp(s0, target, ease(clamp(t / secs))); yield; } f.spin = target; }
+  function* settle(f) {      // slow down and come to rest facing the viewer
+    yield* spinTo(f, 3, .5);
+    let guard = 0; while (!(Math.cos(f.ph) > .97 && Math.sin(f.ph) > 0) && guard < 4) { guard += dt; yield; }
+    f.spin = 0; f.ph = 0;
+  }
+  function* strikeWitch(f, knock) {
+    const s = strike(); for (let k = 0; k < 6; k++) { s.next(); yield; }
+    f.flash = .16; f.ring = .6; burst(f.x, f.y - 120, 12, 'petal');
+    const x0 = f.x; let t = 0; while (t < .25) { t += dt; f.x = lerp(x0, x0 + knock, ease(clamp(t / .25))); yield; }
+    yield* s;
+  }
+  function* fightWitch(f, b) {
+    const act = f.act || 'full';
+    yield* walkTo(f.x - 200);
+    // 1. she drops onto the roof, spinning, bells ringing
+    say('The Mushroom Witch', act === 'rematch' ? '"You again, little prince?" Her bells ring all the way down.' : act === 'short' ? 'Another witch spins down from the water tower.' : '"These roofs belong to the Kingdom now," she sings, and her bells answer.');
+    f.anim = 'witch'; f.t = 0; f.alpha = 1; f.dy = -460; f.spin = 16; f.ph = 0; f.ring = 1;
+    let t = 0; while (t < 1.1) { t += dt; f.dy = lerp(-460, 0, ease(clamp(t / 1.1))); yield; }
+    f.dy = 0; burst(f.x, f.y - 6, 12, 'spore');
+    yield* settle(f);
+    yield* wait(.5);
+    if (act !== 'short') {
+      // 2. the spin attack: a ring of spores rolls across the roof, and Elian jumps it
+      say('She spins like a top', 'Her bells blur into one note, and a ring of spores rolls across the roof.');
+      f.ring = 1; yield* spinTo(f, 18, .6);
+      for (let k = 0; k < 5; k++) parts.push({ x: f.x - 34 - k * 16, y: f.y - 10, vx: -300, vy: 0, life: 3, kind: 'wave', ph: k, floor: f.y - 10 });
+      while (!parts.some(p => p.kind === 'wave' && p.x - E.x < 110)) yield;
+      say('Jump!', 'Elian leaps the spore ring. It rolls past and off the edge of the roof.');
+      yield* jumpTo(E.x + 26, E.y);
+      yield* settle(f);
+    }
+    // 3. dizzy: the only moment she can be struck
+    f.dizzy = true;
+    say('Dizzy!', 'She wobbles on her point. Tap the city to strike now.');
+    waitingStrike = true; strikeNow = false;
+    t = 0; while (t < 1.5 && !strikeNow) { t += dt; yield; }
+    waitingStrike = false;
+    E.anim = 'walk'; while (E.x < f.x - 128) { E.x = Math.min(f.x - 128, E.x + 320 * dt); yield; } E.anim = 'idle';
+    f.dizzy = false;
+    if (act === 'short') {
+      yield* strikeWitch(f, 30);
+    } else {
+      yield* strikeWitch(f, 46);
+      // 4. angry: her eye glows, she spins faster and sends spores up into the air
+      say(act === 'rematch' ? '"Not this time!"' : '"Then rot with them!"', 'Her eye glows violet and she spins faster than ever.');
+      f.anim = 'cast'; f.t = 0; f.ring = 1;
+      yield* spinTo(f, 24, .5);
+      for (let k = 0; k < 3; k++) { burst(f.x, f.y - 230, 10, 'spore'); yield* wait(.3); }
+      yield* settle(f);
+      f.anim = 'witch'; f.dizzy = true;
+      say('Now!', 'Out of breath and spinning slower, she leaves herself open.');
+      waitingStrike = true; strikeNow = false;
+      t = 0; while (t < .9 && !strikeNow) { t += dt; yield; }
+      waitingStrike = false; f.dizzy = false;
+      E.anim = 'walk'; while (E.x < f.x - 128) { E.x = Math.min(f.x - 128, E.x + 320 * dt); yield; } E.anim = 'idle';
+      const s = strike(); for (let k = 0; k < 6; k++) { s.next(); yield; }
+      yield* s;
+    }
+    // 5. she bursts into petals and a flower opens where she stood
+    f.anim = 'wdie'; f.t = 0; f.spin = 0; f.ring = .8; burst(f.x, f.y - 100, 26, 'petal');
+    say('Her bells fall silent', 'Where she stood, a passionflower opens.');
+    yield* wait(1.4);
+  }
+  function drawWitch(f, t) {
+    const S = SH[f.anim]; if (f.anim === 'wdie' && f.t > S.total + 600) return;
+    f.ph = (f.ph || 0) + (f.spin || 0) * dt;
+    const sc = ES * .65, spin = f.spin || 0;
+    ctx.save(); ctx.translate(f.x, f.y + (f.dy || 0));
+    ctx.rotate(f.dizzy ? Math.sin(t * 6.5) * .16 : spin > 1 ? Math.sin(t * 22) * .025 : 0);
+    const rings = (front) => {   // speed lines wrapped around her body
+      if (spin < 3) return;
+      ctx.strokeStyle = `rgba(23,22,29,${(front ? .7 : .3) * clamp(spin / 14)})`; ctx.lineWidth = 1.6;
+      [[-62, 40], [-122, 56], [-186, 66]].forEach(([hy, rx], k) => { const o = (t * spin * .4 + k) % 1; ctx.setLineDash([22, 10]); ctx.lineDashOffset = -o * 64; ctx.beginPath(); ctx.ellipse(0, hy, rx, 8, 0, front ? 0 : Math.PI, front ? Math.PI : 2 * Math.PI); ctx.stroke(); });
+      ctx.setLineDash([]);
+    };
+    rings(false);
+    const body = (ph, alpha) => {
+      ctx.save(); let sx = spin > .3 ? Math.cos(ph) : 1; if (Math.abs(sx) < .14) sx = .14 * (sx < 0 ? -1 : 1); ctx.scale(sx, 1);
+      if (f.flash > 0) sprite('wdie', 0, 0, 0, sc, false, alpha, 0); else sprite(f.anim, f.t, 0, 0, sc, f.anim === 'witch', alpha);
+      ctx.restore();
+    };
+    if (spin > 5 && f.anim !== 'wdie') { body(f.ph - .5, .14); body(f.ph - .25, .26); }
+    body(f.ph, f.alpha ?? 1);
+    rings(true);
+    if (f.ring > 0 && f.anim !== 'wdie') {   // the bells ring: little ink arcs beside them
+      ctx.strokeStyle = `rgba(23,22,29,${clamp(f.ring)})`; ctx.lineWidth = 1.5;
+      [-1, 1].forEach(s => { for (let k = 0; k < 2; k++) { ctx.beginPath(); ctx.arc(s * 30, -86, 9 + k * 7, s > 0 ? -.7 : Math.PI - .7, s > 0 ? .7 : Math.PI + .7); ctx.stroke(); } });
+    }
+    if (f.dizzy) {                            // dizzy spirals over her hat
+      ctx.strokeStyle = INK; ctx.lineWidth = 1.4;
+      [-16, 16].forEach((ox, k) => { ctx.save(); ctx.translate(ox, -262); ctx.rotate(t * 5 * (k ? 1 : -1)); ctx.beginPath(); for (let a = 0; a < 12; a += .3) { const r = a * .75; ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r * .7); } ctx.stroke(); ctx.restore(); });
+    }
+    ctx.restore();
+    f.flash = Math.max(0, (f.flash || 0) - dt); f.ring = Math.max(0, (f.ring || 0) - dt * .8);
+  }
+  function* fightBug(f, b) {
+    say('Spore bugs', 'They drift over the roofs and sow violet spores as they fly.');
+    f.anim = 'bug'; f.t = 0; f.alpha = 1; f.x = E.x + 420; f.y = b.roof - 220;
+    const tx = E.x + 130, ty = b.roof - 120;
+    while (f.x > tx + 1) { f.x = lerp(f.x, tx, Math.min(1, dt * 2.6)); f.y = lerp(f.y, ty, Math.min(1, dt * 2.6)); if (Math.random() < dt * 8) parts.push({ x: f.x, y: f.y + 20, vx: (Math.random() - .5) * 20, vy: 40, life: 1, kind: 'spore' }); yield; }
+    waitingStrike = true; strikeNow = false;
+    let t = 0; while (t < .7 && !strikeNow) { t += dt; yield; }
+    waitingStrike = false;
+    const s = strike(); for (let k = 0; k < 5; k++) { s.next(); yield; }
+    f.anim = 'bdie'; f.t = 0; burst(f.x, f.y, 14, 'petal');
+    yield* s; yield* wait(.5);
+  }
+  const CH = ['I. Fifth Avenue rooftops', 'II. The garment district', 'III. Hell\'s Kitchen water towers', 'IV. The spire'];
+  function* story() {
+    while (true) {
+      // reset the city
+      E.x = -260; E.y = B[0].roof; E.anim = 'walk'; E.slashT = -1; healed = 0; sunGlow = 0; parts = []; foes = []; cam = E.x - VW * .3;
+      B.forEach(b => b.heal = 0); RAYS.forEach(r => r.lit = 0);
+      while (fade > 0) { fade = Math.max(0, fade - dt * 1.5); yield; }
+      say('I. The grey city', 'The Fungi Kingdom has crept over New York. Its rooftops are soft with spores.');
+      for (let i = 0; i < B.length; i++) {
+        const b = B[i];
+        foes = b.enemies.map(e => ({ ...e, x: e.x ?? 0, y: b.roof, alpha: 0, anim: null, t: 0 }));
+        yield* walkTo(Math.max(E.x, b.land + 40));
+        for (const f of foes) { if (f.type === 'witch') yield* fightWitch(f, b); else yield* fightBug(f, b); f.gone = true; }
+        say(CH[i], i === 3 ? 'The last roof. The whole spire bursts into bloom, and the sun of lights wakes up.' : 'Where the sword lily strikes, the roof remembers its garden.');
+        let g = 0; while (g < 1) { g = Math.min(1, g + dt / 2.4); b.heal = g; RAYS.forEach((r, k) => { if (Math.floor(k / 3) === i) r.lit = clamp(g * 3 - (k % 3)); }); yield; }
+        healed = i + 1;
+        if (i < B.length - 1) {
+          yield* walkTo(b.x + b.w - 40);
+          yield* jumpTo(B[i + 1].land, B[i + 1].roof);
+        }
+      }
+      say('The city remembers', 'New York is green again, and one world of the sun is lit. Paris is next.');
+      while (sunGlow < 1) { sunGlow = Math.min(1, sunGlow + dt / 1.5); yield; }
+      yield* wait(4.5);
+      while (fade < 1) { fade = Math.min(1, fade + dt); yield; }
+    }
+  }
+  const run = story();
+
+  /* ------------------------------------------------------------------ input */
+  let paused = false;
+  const pb = document.getElementById('pause');
+  pb.addEventListener('click', () => { paused = !paused; pb.textContent = paused ? 'Play' : 'Pause'; pb.setAttribute('aria-pressed', paused); });
+  cv.addEventListener('click', (e) => {
+    const r = cv.getBoundingClientRect(), wx = (e.clientX - r.left) / K + cam, wy = (e.clientY - r.top) / K;
+    if (waitingStrike) strikeNow = true;
+    burst(wx, wy, 10, 'petal');
+  });
+
+  /* ------------------------------------------------------------------ draw */
+  function frame(tt) {
+    const t = tt / 1000;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.fillStyle = PAPER; ctx.fillRect(0, 0, W, H);
+    ctx.save(); ctx.scale(K, K);
+    const target = E.x - VW * (VW < 700 ? .3 : .52) + (healed === 4 ? 80 : 0);
+    cam = lerp(cam, target, Math.min(1, dt * 2.4));
+    // sky: sun first, then halftone clouds
+    const sx = Math.min(VW - 160, VW * .8), sy = 205;
+    if (VW >= 700) sun(sx, sy, 78, sunGlow, t);
+    CLOUDS.forEach(([c, x, y], k) => { let X = ((x - cam * .12 + t * (6 + k * 2)) % 2800 + 2800) % 2800 - 500; ctx.globalAlpha = .9; ctx.drawImage(c, X, y); ctx.globalAlpha = 1; });
+    // distant skylines (2.5D: each layer slides at its own speed)
+    [[FAR, .22, 520], [MID, .48, 600]].forEach(([L, p, y]) => { const o = ((-cam * p) % L.LW + L.LW) % L.LW - L.LW; for (let x = o; x < VW; x += L.LW) ctx.drawImage(L.c, x, y - 300, L.LW, 600); });
+    const fog = ctx.createLinearGradient(0, 520, 0, 900); fog.addColorStop(0, 'rgba(250,250,247,0)'); fog.addColorStop(1, 'rgba(250,250,247,.75)'); ctx.fillStyle = fog; ctx.fillRect(0, 520, VW, 380);
+    // drifting spores in the air, fewer for every roof healed
+    const sporeAmt = 1 - healed / 4;
+    AIR.forEach((s, k) => { if (k / AIR.length > sporeAmt) return; const x = ((s.x - cam * .8 + Math.sin(t * .5 + s.ph) * 20) % 2600 + 2600) % 2600 - 300, y = (s.y + t * s.sp) % 820; ctx.fillStyle = 'rgba(122,74,142,.55)'; ctx.beginPath(); ctx.arc(x, y, s.r, 0, 7); ctx.fill(); });
+    ctx.translate(-cam, 0);
+    // buildings, rot, poison, vines, flowers
+    B.forEach(b => {
+      if (b.x + b.w + 40 < cam || b.x - 40 > cam + VW) return;
+      ctx.drawImage(b.img, b.x, b.top - 14, b.img.width / S2, b.img.height / S2);
+      if (b.heal < 1) { ctx.globalAlpha = 1 - b.heal; ctx.drawImage(b.rot, b.x, b.top - 14, b.rot.width / S2, b.rot.height / S2); ctx.globalAlpha = 1; }
+      b.poison.forEach(p => { if (b.heal > .7) return; ctx.strokeStyle = 'rgba(70,35,85,.8)'; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.moveTo(p.x, b.roof - 6); ctx.quadraticCurveTo(p.x + 8, b.roof - p.h * .6, p.x + 4, b.roof - p.h); ctx.stroke(); nightshade(p.x + 4, b.roof - p.h, p.r, clamp(b.heal / .7)); });
+      b.vines.forEach(v => drawVine(b, v, b.heal, t));
+      b.fl.forEach(f => drawFlower(f, b.heal * 1.4, t));
+    });
+    // enemies
+    foes.forEach(f => {
+      if (!f.anim || (f.gone && f.anim !== 'wdie' && f.anim !== 'bdie')) return;
+      f.t += dt * 1000;
+      if (f.type === 'witch') return drawWitch(f, t);
+      const S = SH[f.anim], loop = f.anim === 'witch' || f.anim === 'bug';
+      if ((f.anim === 'wdie' || f.anim === 'bdie') && f.t > S.total + 600) return;
+      if (f.anim === 'bdie' && f.t > S.total - 400) return;   // the bug's last frame is a tiny flower; we skip it in the air
+      const sc = f.type === 'witch' ? ES * .65 : ES * 1.3, bob = f.anim === 'bug' ? Math.sin(t * 6) * 6 : 0;
+      sprite(f.anim, f.t, f.x, f.y + bob, sc, loop, f.alpha ?? 1);
+    });
+    // Elian and his slash
+    E.t += dt * 1000;
+    if (E.slashT >= 0) { sprite('idle', 0, E.x, E.y, ES, true, 1, 0); sprite('slash', E.slashT, E.x, E.y, ES, false); E.slashT += dt * 1000; }
+    else sprite(E.anim, E.t, E.x, E.y, ES, E.anim !== 'jump');
+    // petals and spores
+    parts.forEach(p => {
+      if (p.kind === 'wave') { p.x += p.vx * dt; p.y = p.floor - Math.abs(Math.sin(t * 9 + p.ph)) * 12; p.life -= dt * .45; if (p.x < E.x - 260) p.life = Math.min(p.life, .4); }
+      else { p.vy += (p.kind === 'petal' ? 180 : 20) * dt; p.vx *= .99; p.x += p.vx * dt; p.y += p.vy * dt; p.life -= dt * (p.kind === 'petal' ? .55 : .7); }
+      p.rot = (p.rot || 0) + dt * 4;
+      ctx.globalAlpha = clamp(p.life);
+      if (p.kind === 'petal') { ctx.fillStyle = p.col; ctx.strokeStyle = '#4A0F18'; ctx.lineWidth = .8; ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.beginPath(); ctx.ellipse(0, 0, 7, 4, 0, 0, 7); ctx.fill(); ctx.stroke(); ctx.restore(); }
+      else { const r = p.kind === 'wave' ? 9 : 4; ctx.fillStyle = '#8E5BA6'; ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, 7); ctx.fill(); ctx.strokeStyle = INK; ctx.lineWidth = p.kind === 'wave' ? 1.6 : 1; ctx.stroke(); if (p.kind === 'wave') { ctx.fillStyle = '#D9B45A'; ctx.beginPath(); ctx.arc(p.x - 3, p.y - 3, 2, 0, 7); ctx.fill(); } }
+      ctx.globalAlpha = 1;
+    });
+    parts = parts.filter(p => p.life > 0);
+    ctx.restore();
+    if (fade > 0) { ctx.fillStyle = `rgba(250,250,247,${fade})`; ctx.fillRect(0, 0, W, H); }
+  }
+
+  /* ------------------------------------------------------------------ loop */
+  let last = performance.now();
+  function tick(now) {
+    dt = paused ? 0 : Math.min(.05, (now - last) / 1000); last = now;
+    if (pending === 0 && !paused) run.next();
+    frame(now);
+    requestAnimationFrame(tick);
+  }
+  // with reduced motion, jump straight to the healed city and hold it
+  if (reduce) {
+    const waitLoad = () => { if (pending > 0) return setTimeout(waitLoad, 100); dt = 1 / 30; for (let k = 0; k < 30 * 60 && sunGlow < 1; k++) { run.next(); parts = []; foes.forEach(f => f.t = 1e6); } cam = E.x - VW * .52 + 80; paused = true; pb.textContent = 'Play'; pb.setAttribute('aria-pressed', true); };
+    waitLoad();
+  }
+  requestAnimationFrame(tick);
+
+  /* ------------------------------------------------------------------ plan of lights figure */
+  const svg = document.getElementById('plan'), NS = 'http://www.w3.org/2000/svg';
+  const el = (t, a) => { const n = document.createElementNS(NS, t); for (const k in a) n.setAttribute(k, a[k]); svg.appendChild(n); return n; };
+  const names = ['New York', 'Paris', 'Drowned Meadow', 'Emberbloom', 'Frostpetal', 'Hollow Wood'];
+  el('circle', { cx: 200, cy: 200, r: 120, fill: 'none', stroke: INK, 'stroke-width': 1 });
+  el('circle', { cx: 200, cy: 200, r: 44, fill: 'none', stroke: INK, 'stroke-width': 1 });
+  for (let k = 0; k < 24; k++) { const a = k / 24 * Math.PI * 2; el('line', { x1: 200 + Math.cos(a) * 24, y1: 200 + Math.sin(a) * 24, x2: 200 + Math.cos(a) * (k % 2 ? 60 : 72), y2: 200 + Math.sin(a) * (k % 2 ? 60 : 72), stroke: INK, 'stroke-width': .8 }); }
+  el('circle', { cx: 200, cy: 200, r: 16, fill: GOLD, stroke: INK, 'stroke-width': 1.2 });
+  names.forEach((n, k) => {
+    const a = -Math.PI / 2 + k / 6 * Math.PI * 2, x = 200 + Math.cos(a) * 150, y = 200 + Math.sin(a) * 150, on = k === 0;
+    el('line', { x1: 200 + Math.cos(a) * 18, y1: 200 + Math.sin(a) * 18, x2: 200 + Math.cos(a) * 124, y2: 200 + Math.sin(a) * 124, stroke: on ? GOLD : INK, 'stroke-width': on ? 2 : 1.1 });
+    el('circle', { cx: x, cy: y, r: 26, fill: on ? '#E8BE5A' : PAPER, stroke: INK, 'stroke-width': 1.3 });
+    const tx = el('text', { x, y: y + (Math.sin(a) > .3 ? 44 : -34), 'text-anchor': 'middle', 'font-family': 'IM Fell English, Georgia, serif', 'font-size': 14, fill: on ? GOLD : '#4A4855' }); tx.textContent = n;
+  });
+})();
+</script>
+
+</body>
+</html>
